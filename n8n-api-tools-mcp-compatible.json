@@ -1,0 +1,665 @@
+{
+  "name": "n8n API Tools - MCP Compatible",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "agent-node",
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [260, 600],
+      "notes": "Connect all tool nodes to the 'Tools' input of this Agent node"
+    },
+    {
+      "parameters": {
+        "name": "n8n_create_workflow",
+        "description": "Create workflow. Requires: name, nodes[], connections{}. Created inactive. Returns workflow with ID.",
+        "method": "POST",
+        "url": "={{ $vars.N8N_API_URL }}/api/v1/workflows",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"name\": \"{{ $json.name }}\",\n  \"nodes\": {{ JSON.stringify($json.nodes) }},\n  \"connections\": {{ JSON.stringify($json.connections) }},\n  \"settings\": {{ JSON.stringify($json.settings || {executionOrder: 'v1'}) }},\n  \"active\": false\n}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        },
+        "placeholderDefinitions": {
+          "values": [
+            {
+              "name": "name",
+              "description": "Workflow name (required)"
+            },
+            {
+              "name": "nodes",
+              "description": "Array of workflow nodes with id, name, type, typeVersion, position, parameters"
+            },
+            {
+              "name": "connections",
+              "description": "Workflow connections object. Keys are source node names"
+            },
+            {
+              "name": "settings",
+              "description": "Optional workflow settings (executionOrder, timezone, etc.)"
+            }
+          ]
+        }
+      },
+      "id": "tool-create-workflow",
+      "name": "Create Workflow",
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "typeVersion": 1.1,
+      "position": [500, 100],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "{{credentialId}}",
+          "name": "n8n API Header Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "name": "n8n_get_workflow",
+        "description": "Get a workflow by ID. Returns the complete workflow including nodes, connections, and settings.",
+        "method": "GET",
+        "url": "={{ $vars.N8N_API_URL }}/api/v1/workflows/{{ $json.id }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        },
+        "placeholderDefinitions": {
+          "values": [
+            {
+              "name": "id",
+              "description": "Workflow ID"
+            }
+          ]
+        }
+      },
+      "id": "tool-get-workflow",
+      "name": "Get Workflow",
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "typeVersion": 1.1,
+      "position": [500, 220],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "{{credentialId}}",
+          "name": "n8n API Header Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "name": "n8n_update_workflow",
+        "description": "Full workflow update. Requires complete nodes[] and connections{}.",
+        "method": "PUT",
+        "url": "={{ $vars.N8N_API_URL }}/api/v1/workflows/{{ $json.id }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"name\": \"{{ $json.name }}\",\n  \"nodes\": {{ JSON.stringify($json.nodes) }},\n  \"connections\": {{ JSON.stringify($json.connections) }},\n  \"settings\": {{ JSON.stringify($json.settings || {}) }},\n  \"active\": {{ $json.active || false }}\n}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        },
+        "placeholderDefinitions": {
+          "values": [
+            {
+              "name": "id",
+              "description": "Workflow ID to update"
+            },
+            {
+              "name": "name",
+              "description": "New workflow name"
+            },
+            {
+              "name": "nodes",
+              "description": "Complete array of workflow nodes"
+            },
+            {
+              "name": "connections",
+              "description": "Complete connections object"
+            },
+            {
+              "name": "settings",
+              "description": "Workflow settings"
+            },
+            {
+              "name": "active",
+              "description": "Whether workflow is active"
+            }
+          ]
+        }
+      },
+      "id": "tool-update-workflow",
+      "name": "Update Workflow",
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "typeVersion": 1.1,
+      "position": [500, 340],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "{{credentialId}}",
+          "name": "n8n API Header Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "name": "n8n_delete_workflow",
+        "description": "Permanently delete a workflow. This action cannot be undone.",
+        "method": "DELETE",
+        "url": "={{ $vars.N8N_API_URL }}/api/v1/workflows/{{ $json.id }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        },
+        "placeholderDefinitions": {
+          "values": [
+            {
+              "name": "id",
+              "description": "Workflow ID to delete"
+            }
+          ]
+        }
+      },
+      "id": "tool-delete-workflow",
+      "name": "Delete Workflow",
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "typeVersion": 1.1,
+      "position": [500, 460],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "{{credentialId}}",
+          "name": "n8n API Header Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "name": "n8n_list_workflows",
+        "description": "List workflows (minimal metadata only). Returns id/name/active/dates/tags.",
+        "method": "GET",
+        "url": "={{ $vars.N8N_API_URL }}/api/v1/workflows",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "limit",
+              "value": "={{ $json.limit || 100 }}"
+            },
+            {
+              "name": "cursor",
+              "value": "={{ $json.cursor || '' }}"
+            },
+            {
+              "name": "active",
+              "value": "={{ $json.active !== undefined ? $json.active : '' }}"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        },
+        "placeholderDefinitions": {
+          "values": [
+            {
+              "name": "limit",
+              "description": "Number of workflows to return (1-100, default: 100)"
+            },
+            {
+              "name": "cursor",
+              "description": "Pagination cursor from previous response"
+            },
+            {
+              "name": "active",
+              "description": "Filter by active status (true/false)"
+            }
+          ]
+        }
+      },
+      "id": "tool-list-workflows",
+      "name": "List Workflows",
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "typeVersion": 1.1,
+      "position": [500, 580],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "{{credentialId}}",
+          "name": "n8n API Header Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "name": "n8n_activate_workflow",
+        "description": "Activate a workflow by ID",
+        "method": "POST",
+        "url": "={{ $vars.N8N_API_URL }}/api/v1/workflows/{{ $json.id }}/activate",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        },
+        "placeholderDefinitions": {
+          "values": [
+            {
+              "name": "id",
+              "description": "Workflow ID to activate"
+            }
+          ]
+        }
+      },
+      "id": "tool-activate-workflow",
+      "name": "Activate Workflow",
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "typeVersion": 1.1,
+      "position": [500, 700],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "{{credentialId}}",
+          "name": "n8n API Header Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "name": "n8n_deactivate_workflow",
+        "description": "Deactivate a workflow by ID",
+        "method": "POST",
+        "url": "={{ $vars.N8N_API_URL }}/api/v1/workflows/{{ $json.id }}/deactivate",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        },
+        "placeholderDefinitions": {
+          "values": [
+            {
+              "name": "id",
+              "description": "Workflow ID to deactivate"
+            }
+          ]
+        }
+      },
+      "id": "tool-deactivate-workflow",
+      "name": "Deactivate Workflow",
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "typeVersion": 1.1,
+      "position": [500, 820],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "{{credentialId}}",
+          "name": "n8n API Header Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "name": "n8n_execute_workflow",
+        "description": "Execute a workflow by ID with optional data",
+        "method": "POST",
+        "url": "={{ $vars.N8N_API_URL }}/api/v1/workflows/{{ $json.id }}/execute",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json.data || {}) }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        },
+        "placeholderDefinitions": {
+          "values": [
+            {
+              "name": "id",
+              "description": "Workflow ID to execute"
+            },
+            {
+              "name": "data",
+              "description": "Optional data to pass to the workflow"
+            }
+          ]
+        }
+      },
+      "id": "tool-execute-workflow",
+      "name": "Execute Workflow",
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "typeVersion": 1.1,
+      "position": [500, 940],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "{{credentialId}}",
+          "name": "n8n API Header Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "name": "n8n_list_executions",
+        "description": "List workflow executions with filters",
+        "method": "GET",
+        "url": "={{ $vars.N8N_API_URL }}/api/v1/executions",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "limit",
+              "value": "={{ $json.limit || 100 }}"
+            },
+            {
+              "name": "cursor",
+              "value": "={{ $json.cursor || '' }}"
+            },
+            {
+              "name": "workflowId",
+              "value": "={{ $json.workflowId || '' }}"
+            },
+            {
+              "name": "status",
+              "value": "={{ $json.status || '' }}"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        },
+        "placeholderDefinitions": {
+          "values": [
+            {
+              "name": "limit",
+              "description": "Number of executions to return"
+            },
+            {
+              "name": "cursor",
+              "description": "Pagination cursor"
+            },
+            {
+              "name": "workflowId",
+              "description": "Filter by workflow ID"
+            },
+            {
+              "name": "status",
+              "description": "Filter by status: success, error, waiting"
+            }
+          ]
+        }
+      },
+      "id": "tool-list-executions",
+      "name": "List Executions",
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "typeVersion": 1.1,
+      "position": [500, 1060],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "{{credentialId}}",
+          "name": "n8n API Header Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "name": "n8n_get_execution",
+        "description": "Get execution details by ID",
+        "method": "GET",
+        "url": "={{ $vars.N8N_API_URL }}/api/v1/executions/{{ $json.id }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        },
+        "placeholderDefinitions": {
+          "values": [
+            {
+              "name": "id",
+              "description": "Execution ID"
+            }
+          ]
+        }
+      },
+      "id": "tool-get-execution",
+      "name": "Get Execution",
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "typeVersion": 1.1,
+      "position": [500, 1180],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "{{credentialId}}",
+          "name": "n8n API Header Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "name": "n8n_health_check",
+        "description": "Check n8n API connectivity and status",
+        "method": "GET",
+        "url": "={{ $vars.N8N_API_URL }}/api/v1/workflows?limit=1",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "id": "tool-health-check",
+      "name": "Health Check",
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "typeVersion": 1.1,
+      "position": [500, 1300],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "{{credentialId}}",
+          "name": "n8n API Header Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## n8n API Tools - MCP Compatible\n\n### Setup Instructions\n\n1. **Create Variables** (Settings → Variables):\n   ```\n   N8N_API_URL = https://your-instance.app.n8n.cloud\n   ```\n   Note: NO /api/v1 suffix - it's added in the nodes\n\n2. **Create Credential** (Credentials → Header Auth):\n   - Name: `n8n API Header Auth`\n   - Header Name: `X-N8N-API-KEY`\n   - Header Value: `[your-api-key]`\n\n3. **Connect Tools**:\n   - Connect all tool nodes to the Agent's \"Tools\" input\n   - The agent will discover and use them automatically\n\n### Tool Descriptions (MCP Compatible)\n\nThese tools mirror the n8n-mcp server functionality:\n\n| Tool | MCP Equivalent | Description |\n|------|---------------|-------------|\n| Create Workflow | n8n_create_workflow | Create new workflow |\n| Get Workflow | n8n_get_workflow | Get workflow by ID |\n| Update Workflow | n8n_update_workflow | Full workflow update |\n| Delete Workflow | n8n_delete_workflow | Delete workflow |\n| List Workflows | n8n_list_workflows | List all workflows |\n| Activate Workflow | n8n_activate_workflow | Activate workflow |\n| Deactivate Workflow | n8n_deactivate_workflow | Deactivate workflow |\n| Execute Workflow | n8n_execute_workflow | Execute workflow |\n| List Executions | n8n_list_executions | List executions |\n| Get Execution | n8n_get_execution | Get execution details |\n| Health Check | n8n_health_check | Check API status |\n\n### Agent System Prompt\n\n```\nYou are an n8n workflow manager with API tools.\nYou can:\n- Create, read, update, delete workflows\n- Activate and deactivate workflows\n- Execute workflows and monitor executions\n- Manage the entire n8n instance programmatically\n\nWhen creating workflows:\n- Ensure proper node structure\n- Use valid node types and versions\n- Connect nodes properly\n- Set appropriate parameters\n```",
+        "width": 600,
+        "height": 1400,
+        "color": 4
+      },
+      "id": "setup-instructions",
+      "name": "MCP Compatible Setup",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [800, 100]
+    }
+  ],
+  "connections": {
+    "Create Workflow": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "@n8n/n8n-nodes-langchain.agent",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Workflow": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "@n8n/n8n-nodes-langchain.agent",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Workflow": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "@n8n/n8n-nodes-langchain.agent",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete Workflow": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "@n8n/n8n-nodes-langchain.agent",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "List Workflows": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "@n8n/n8n-nodes-langchain.agent",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Activate Workflow": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "@n8n/n8n-nodes-langchain.agent",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Deactivate Workflow": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "@n8n/n8n-nodes-langchain.agent",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Workflow": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "@n8n/n8n-nodes-langchain.agent",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "List Executions": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "@n8n/n8n-nodes-langchain.agent",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Execution": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "@n8n/n8n-nodes-langchain.agent",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Health Check": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "@n8n/n8n-nodes-langchain.agent",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "mcp-1.0.0",
+  "meta": {
+    "templateCredsSetupCompleted": false,
+    "instanceId": "n8n-api-tools-mcp"
+  },
+  "id": "n8n-api-tools-mcp",
+  "tags": [
+    {
+      "name": "API",
+      "createdAt": "2024-01-01T00:00:00.000Z"
+    },
+    {
+      "name": "MCP-Compatible",
+      "createdAt": "2024-01-01T00:00:00.000Z"
+    },
+    {
+      "name": "AI-Tools",
+      "createdAt": "2024-01-01T00:00:00.000Z"
+    }
+  ]
+}
