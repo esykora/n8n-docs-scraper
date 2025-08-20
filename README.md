@@ -4,10 +4,26 @@ This toolkit helps you scrape n8n documentation and create a comprehensive markd
 
 ## 📁 Files Included
 
+### Documentation Scraper
 1. **`n8n_doc_scraper.py`** - Python script that scrapes n8n documentation
 2. **`requirements.txt`** - Python dependencies
 3. **`n8n_llm_prompt_template.md`** - Prompt template for using with LLMs
-4. **`README_n8n_docs.md`** - This file
+4. **`n8n_documentation.md`** - Pre-scraped documentation (14MB, 157 pages)
+5. **`n8n_documentation.json`** - Structured JSON version
+
+### n8n API Toolkit
+6. **`n8n-api-toolkit-workflow.json`** - Complete n8n workflow with API operations
+7. **`n8n-api-toolkit-guide.md`** - Comprehensive guide for API toolkit usage
+
+## 🎯 What's New: n8n API Toolkit
+
+Now includes a complete set of HTTP Request nodes for n8n API operations!
+- **11 pre-configured API operations** (list, search, create, update, delete, execute, etc.)
+- **Ready for MCP Server integration** - Connect with Model Context Protocol
+- **AI Agent compatible** - Use as tools in n8n AI Agent nodes
+- **Complete workflow management** via API
+
+[Jump to API Toolkit Guide](#n8n-api-toolkit)
 
 ## 🚀 Quick Start
 
@@ -208,3 +224,59 @@ Feel free to improve the scraper or prompt template:
 ---
 
 **Note**: Always respect the website's robots.txt and terms of service when scraping. This tool is for personal use to improve your n8n workflow development experience.
+
+---
+
+## n8n API Toolkit
+
+### Overview
+A complete n8n workflow with pre-configured HTTP Request nodes for all n8n API operations. Perfect for:
+- Building meta-workflows that manage other workflows
+- Integrating with MCP (Model Context Protocol) servers
+- Providing n8n AI Agents with workflow management capabilities
+
+### Quick Setup
+
+1. **Import the Workflow**:
+   - Copy `n8n-api-toolkit-workflow.json`
+   - Import into n8n (Workflows → Import)
+
+2. **Configure Environment Variables**:
+   ```bash
+   N8N_API_URL=https://your-n8n.com/api/v1
+   N8N_API_KEY=your-api-key-here
+   ```
+
+3. **Available Operations**:
+   - **Workflow Management**: list, search, read, create, update, delete
+   - **Execution Control**: execute, activate, deactivate
+   - **History**: list-executions, get-execution
+
+### Usage Example
+```json
+{
+  "action": "create",
+  "workflowData": {
+    "name": "New Workflow",
+    "nodes": [...],
+    "connections": {...}
+  }
+}
+```
+
+### Integration Options
+
+#### With MCP Server:
+- Replace Manual Trigger with MCP Server Trigger
+- Map tool calls to action router
+- Use for AI-powered workflow automation
+
+#### With n8n AI Agent:
+- Replace trigger with Agent node
+- Each API operation becomes a callable tool
+- Agent can manage workflows based on natural language
+
+### Documentation
+For complete documentation, see [`n8n-api-toolkit-guide.md`](n8n-api-toolkit-guide.md)
+
+---

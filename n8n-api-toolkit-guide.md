@@ -1,17 +1,19 @@
-# n8n API Toolkit for MCP Server & AI Agents
+# n8n API Tools for AI Agents & MCP Servers
 
 ## Overview
 
-This toolkit provides a complete set of HTTP Request nodes configured to interact with the n8n API. These nodes can be used as tool actions for:
-- **MCP Server Integration**: Connect to Model Context Protocol servers
-- **n8n AI Agents**: Provide agents with workflow management capabilities
-- **Automation**: Build meta-workflows that manage other workflows
+This toolkit provides a complete set of **AI Tool nodes** (`@n8n/n8n-nodes-langchain.toolHttpRequest`) that can be connected to:
+- **AI Agent Nodes**: Provide agents with workflow management capabilities via tools
+- **MCP Server Triggers**: Connect to Model Context Protocol servers as callable tools
+- **Chat Interfaces**: Build conversational workflow management systems
+
+**Important**: These are AI tool nodes designed specifically to be connected to the "Tools" input of Agent nodes, not regular workflow nodes
 
 ## 🚀 Quick Start
 
 ### 1. Import the Workflow
 
-1. Copy the content from `n8n-api-toolkit-workflow.json`
+1. Copy the content from `n8n-api-tools-workflow.json`
 2. In n8n, go to **Workflows** → **Import from File**
 3. Paste the JSON and import
 
@@ -129,19 +131,16 @@ N8N_API_KEY=your-api-key-here
 }
 ```
 
-## 🤖 Integration with MCP Server
+## 🤖 Integration with AI Agents
 
 ### Setup Steps:
 
-1. **Replace the Manual Trigger** with an MCP Server Trigger node
-2. **Configure MCP Server Connection**:
-   ```json
-   {
-     "serverUrl": "http://localhost:3000",
-     "apiKey": "mcp-server-key"
-   }
-   ```
-3. **Map MCP Tool Calls** to the action router
+1. **Replace the Manual Trigger** with an Agent node (`@n8n/n8n-nodes-langchain.agent`)
+2. **Connect all tool nodes** to the "Tools" input of the Agent node
+3. **Configure the Agent** with:
+   - Model selection (GPT-4, Claude, etc.)
+   - System prompt describing capabilities
+   - Memory settings if needed
 
 ### MCP Tool Definition:
 ```json
@@ -173,22 +172,17 @@ N8N_API_KEY=your-api-key-here
 }
 ```
 
-## 🧠 Integration with n8n AI Agents
+## 🌐 Integration with MCP Servers
 
-### Setup for AI Agent:
+### Setup for MCP Server:
 
-1. **Add an Agent Node** instead of Manual Trigger
-2. **Configure Agent Tools**:
-   - Each HTTP Request node becomes a tool
-   - The agent can call them based on user intent
-3. **Add System Prompt**:
-   ```
-   You are an n8n workflow manager. You can:
-   - List and search workflows
-   - Create and update workflows
-   - Execute workflows on demand
-   - Manage workflow activation status
-   ```
+1. **Replace Manual Trigger** with MCP Server Trigger
+2. **Connect all tool nodes** to the MCP Server's tools handler
+3. **Configure MCP endpoints** for tool discovery and execution
+4. **The MCP server will**:
+   - Expose these tools to connected clients
+   - Handle tool calls from AI assistants
+   - Return results in MCP format
 
 ### Agent Tool Configuration:
 ```javascript
