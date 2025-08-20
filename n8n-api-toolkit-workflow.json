@@ -1,0 +1,740 @@
+{
+  "name": "n8n API Toolkit - MCP/Agent Tools",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "name": "MCP Server Trigger / Agent Input",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [220, 300],
+      "notes": "Replace with MCP Server Trigger or Agent node\n\nExpected input:\n- action: 'list' | 'search' | 'read' | 'create' | 'update' | 'execute' | 'activate' | 'deactivate'\n- workflowId: (for read/update/execute/activate/deactivate)\n- searchQuery: (for search)\n- workflowData: (for create/update)"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "b9f8e5d4-3c2a-1098-7654-321098765432",
+              "leftValue": "={{ $json.action }}",
+              "rightValue": "list",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "switch-router-node",
+      "name": "Route by Action",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [440, 300]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $env.N8N_API_URL }}/workflows",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-N8N-API-KEY",
+              "value": "={{ $env.N8N_API_KEY }}"
+            }
+          ]
+        },
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "limit",
+              "value": "={{ $json.limit || 100 }}"
+            },
+            {
+              "name": "active",
+              "value": "={{ $json.active || '' }}"
+            },
+            {
+              "name": "tags",
+              "value": "={{ $json.tags || '' }}"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": false,
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "id": "list-workflows-node",
+      "name": "List Workflows",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [700, 100],
+      "notes": "Lists all workflows\n\nOptional params:\n- limit: number (default 100)\n- active: boolean\n- tags: string (comma-separated)"
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $env.N8N_API_URL }}/workflows",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-N8N-API-KEY",
+              "value": "={{ $env.N8N_API_KEY }}"
+            }
+          ]
+        },
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "search",
+              "value": "={{ $json.searchQuery }}"
+            },
+            {
+              "name": "limit",
+              "value": "={{ $json.limit || 100 }}"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": false,
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "id": "search-workflows-node",
+      "name": "Search Workflows",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [700, 220],
+      "notes": "Search workflows by name/description\n\nRequired:\n- searchQuery: string\n\nOptional:\n- limit: number"
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $env.N8N_API_URL }}/workflows/{{ $json.workflowId }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-N8N-API-KEY",
+              "value": "={{ $env.N8N_API_KEY }}"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": false,
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "id": "read-workflow-node",
+      "name": "Read Workflow",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [700, 340],
+      "notes": "Get a specific workflow\n\nRequired:\n- workflowId: string"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.N8N_API_URL }}/workflows",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-N8N-API-KEY",
+              "value": "={{ $env.N8N_API_KEY }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "workflow",
+              "value": "={{ JSON.stringify($json.workflowData) }}"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": false,
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "id": "create-workflow-node",
+      "name": "Create Workflow",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [700, 460],
+      "notes": "Create a new workflow\n\nRequired in workflowData:\n- name: string\n- nodes: array\n- connections: object\n- active: boolean\n- settings: object (optional)\n- staticData: object (optional)"
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "={{ $env.N8N_API_URL }}/workflows/{{ $json.workflowId }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-N8N-API-KEY",
+              "value": "={{ $env.N8N_API_KEY }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "workflow",
+              "value": "={{ JSON.stringify($json.workflowData) }}"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": false,
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "id": "update-workflow-node",
+      "name": "Update Workflow",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [700, 580],
+      "notes": "Update an existing workflow\n\nRequired:\n- workflowId: string\n- workflowData: object (partial update allowed)"
+    },
+    {
+      "parameters": {
+        "method": "DELETE",
+        "url": "={{ $env.N8N_API_URL }}/workflows/{{ $json.workflowId }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-N8N-API-KEY",
+              "value": "={{ $env.N8N_API_KEY }}"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": false,
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "id": "delete-workflow-node",
+      "name": "Delete Workflow",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [700, 700],
+      "notes": "Delete a workflow\n\nRequired:\n- workflowId: string"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.N8N_API_URL }}/workflows/{{ $json.workflowId }}/execute",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-N8N-API-KEY",
+              "value": "={{ $env.N8N_API_KEY }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "data",
+              "value": "={{ JSON.stringify($json.executionData || {}) }}"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": false,
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "id": "execute-workflow-node",
+      "name": "Execute Workflow",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [700, 820],
+      "notes": "Execute a workflow\n\nRequired:\n- workflowId: string\n\nOptional:\n- executionData: object (input data for the workflow)"
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "={{ $env.N8N_API_URL }}/workflows/{{ $json.workflowId }}/activate",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-N8N-API-KEY",
+              "value": "={{ $env.N8N_API_KEY }}"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": false,
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "id": "activate-workflow-node",
+      "name": "Activate Workflow",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [700, 940],
+      "notes": "Activate a workflow\n\nRequired:\n- workflowId: string"
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "={{ $env.N8N_API_URL }}/workflows/{{ $json.workflowId }}/deactivate",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-N8N-API-KEY",
+              "value": "={{ $env.N8N_API_KEY }}"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": false,
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "id": "deactivate-workflow-node",
+      "name": "Deactivate Workflow",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [700, 1060],
+      "notes": "Deactivate a workflow\n\nRequired:\n- workflowId: string"
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $env.N8N_API_URL }}/executions",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-N8N-API-KEY",
+              "value": "={{ $env.N8N_API_KEY }}"
+            }
+          ]
+        },
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "workflowId",
+              "value": "={{ $json.workflowId || '' }}"
+            },
+            {
+              "name": "status",
+              "value": "={{ $json.status || '' }}"
+            },
+            {
+              "name": "limit",
+              "value": "={{ $json.limit || 100 }}"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": false,
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "id": "list-executions-node",
+      "name": "List Executions",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [700, 1180],
+      "notes": "List workflow executions\n\nOptional:\n- workflowId: string\n- status: 'success' | 'error' | 'running'\n- limit: number"
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $env.N8N_API_URL }}/executions/{{ $json.executionId }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-N8N-API-KEY",
+              "value": "={{ $env.N8N_API_KEY }}"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": false,
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "id": "get-execution-node",
+      "name": "Get Execution Details",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [700, 1300],
+      "notes": "Get execution details\n\nRequired:\n- executionId: string"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Format the response for MCP/Agent output\nconst action = $input.first().json.action;\nconst result = $input.first().json;\n\n// Structure the response based on action type\nlet response = {\n  action: action,\n  success: true,\n  timestamp: new Date().toISOString()\n};\n\nswitch(action) {\n  case 'list':\n  case 'search':\n    response.workflows = result.data || [];\n    response.count = response.workflows.length;\n    response.summary = response.workflows.map(w => ({\n      id: w.id,\n      name: w.name,\n      active: w.active,\n      tags: w.tags || [],\n      createdAt: w.createdAt,\n      updatedAt: w.updatedAt\n    }));\n    break;\n    \n  case 'read':\n    response.workflow = result;\n    response.nodeCount = result.nodes ? result.nodes.length : 0;\n    response.isActive = result.active;\n    break;\n    \n  case 'create':\n  case 'update':\n    response.workflow = result;\n    response.message = `Workflow ${action}d successfully`;\n    response.workflowId = result.id;\n    break;\n    \n  case 'delete':\n    response.message = 'Workflow deleted successfully';\n    break;\n    \n  case 'execute':\n    response.execution = result;\n    response.executionId = result.id;\n    response.status = result.status;\n    break;\n    \n  case 'activate':\n  case 'deactivate':\n    response.workflow = result;\n    response.active = result.active;\n    response.message = `Workflow ${action}d successfully`;\n    break;\n    \n  case 'list-executions':\n    response.executions = result.data || [];\n    response.count = response.executions.length;\n    break;\n    \n  case 'get-execution':\n    response.execution = result;\n    response.status = result.status;\n    response.workflowId = result.workflowId;\n    break;\n    \n  default:\n    response.error = 'Unknown action';\n    response.success = false;\n}\n\nreturn response;"
+      },
+      "id": "format-response-node",
+      "name": "Format Response for MCP/Agent",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [960, 700]
+    },
+    {
+      "parameters": {
+        "content": "## n8n API Toolkit for MCP/Agent Integration\n\n### Setup Instructions:\n\n1. **Environment Variables Required:**\n   - `N8N_API_URL`: Your n8n instance URL (e.g., `https://your-n8n.com/api/v1`)\n   - `N8N_API_KEY`: Your n8n API key\n\n2. **Get API Key:**\n   - Go to n8n Settings → API\n   - Generate a new API key\n   - Store it securely\n\n3. **Usage with MCP Server:**\n   - Replace the Manual Trigger with MCP Server Trigger\n   - Connect to your MCP tools\n   - Send action and parameters as JSON\n\n4. **Usage with n8n AI Agent:**\n   - Replace Manual Trigger with Agent node\n   - Configure tools for the agent\n   - Each HTTP node becomes a callable tool\n\n### Available Actions:\n\n| Action | Required Params | Optional Params |\n|--------|----------------|------------------|\n| `list` | - | limit, active, tags |\n| `search` | searchQuery | limit |\n| `read` | workflowId | - |\n| `create` | workflowData | - |\n| `update` | workflowId, workflowData | - |\n| `delete` | workflowId | - |\n| `execute` | workflowId | executionData |\n| `activate` | workflowId | - |\n| `deactivate` | workflowId | - |\n| `list-executions` | - | workflowId, status, limit |\n| `get-execution` | executionId | - |\n\n### Example Input:\n```json\n{\n  \"action\": \"create\",\n  \"workflowData\": {\n    \"name\": \"My New Workflow\",\n    \"nodes\": [...],\n    \"connections\": {...},\n    \"active\": false\n  }\n}\n```",
+        "width": 600,
+        "height": 800,
+        "color": 4
+      },
+      "id": "documentation-note",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [1200, 100]
+    }
+  ],
+  "connections": {
+    "MCP Server Trigger / Agent Input": {
+      "main": [
+        [
+          {
+            "node": "Route by Action",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route by Action": {
+      "main": [
+        [
+          {
+            "node": "List Workflows",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Search Workflows",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Read Workflow",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create Workflow",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Update Workflow",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Delete Workflow",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Execute Workflow",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Activate Workflow",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Deactivate Workflow",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "List Executions",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get Execution Details",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "List Workflows": {
+      "main": [
+        [
+          {
+            "node": "Format Response for MCP/Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search Workflows": {
+      "main": [
+        [
+          {
+            "node": "Format Response for MCP/Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Workflow": {
+      "main": [
+        [
+          {
+            "node": "Format Response for MCP/Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Workflow": {
+      "main": [
+        [
+          {
+            "node": "Format Response for MCP/Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Workflow": {
+      "main": [
+        [
+          {
+            "node": "Format Response for MCP/Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete Workflow": {
+      "main": [
+        [
+          {
+            "node": "Format Response for MCP/Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Workflow": {
+      "main": [
+        [
+          {
+            "node": "Format Response for MCP/Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Activate Workflow": {
+      "main": [
+        [
+          {
+            "node": "Format Response for MCP/Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Deactivate Workflow": {
+      "main": [
+        [
+          {
+            "node": "Format Response for MCP/Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "List Executions": {
+      "main": [
+        [
+          {
+            "node": "Format Response for MCP/Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Execution Details": {
+      "main": [
+        [
+          {
+            "node": "Format Response for MCP/Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "1.0.0",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "n8n-api-toolkit"
+  },
+  "id": "n8n-api-toolkit-001",
+  "tags": [
+    {
+      "name": "API",
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z"
+    },
+    {
+      "name": "MCP",
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z"
+    },
+    {
+      "name": "Agent",
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z"
+    },
+    {
+      "name": "Toolkit",
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z"
+    }
+  ]
+}
