@@ -12,16 +12,26 @@ This toolkit helps you scrape n8n documentation and create a comprehensive markd
 5. **`n8n_documentation.json`** - Structured JSON version
 
 ### n8n API Toolkit
-6. **`n8n-api-toolkit-workflow.json`** - Complete n8n workflow with API operations
+6. **`n8n-api-toolkit-workflow.json`** - Initial workflow with regular HTTP nodes
 7. **`n8n-api-toolkit-guide.md`** - Comprehensive guide for API toolkit usage
+8. **`n8n-api-tools-workflow.json`** - AI tool nodes for self-hosted instances
+9. **`n8n-api-tools-cloud-workflow.json`** - Cloud-compatible version with $vars
+10. **`n8n-api-tools-mcp-compatible.json`** - MCP-compatible tool nodes (RECOMMENDED)
+11. **`n8n-cloud-authentication-guide.md`** - Complete n8n Cloud auth guide
 
-## 🎯 What's New: n8n API Toolkit
+## 🎯 What's New: MCP-Compatible n8n API Tools
 
-Now includes a complete set of HTTP Request nodes for n8n API operations!
-- **11 pre-configured API operations** (list, search, create, update, delete, execute, etc.)
-- **Ready for MCP Server integration** - Connect with Model Context Protocol
-- **AI Agent compatible** - Use as tools in n8n AI Agent nodes
-- **Complete workflow management** via API
+Complete integration between n8n and MCP (Model Context Protocol)!
+- **12 AI tool nodes** that mirror n8n-mcp server functionality
+- **Cloud-ready** with proper authentication guides
+- **Agent-compatible** - Connect directly to n8n AI Agent nodes
+- **Full workflow management** - Create, update, execute, monitor
+- **Three versions** for different deployment scenarios
+
+### Which Version to Use?
+- **`n8n-api-tools-mcp-compatible.json`** ← RECOMMENDED: Full MCP compatibility
+- **`n8n-api-tools-cloud-workflow.json`** ← For n8n Cloud instances
+- **`n8n-api-toolkit-workflow.json`** ← Legacy version with regular HTTP nodes
 
 [Jump to API Toolkit Guide](#n8n-api-toolkit)
 
@@ -277,6 +287,8 @@ A complete n8n workflow with pre-configured HTTP Request nodes for all n8n API o
 - Agent can manage workflows based on natural language
 
 ### Documentation
-For complete documentation, see [`n8n-api-toolkit-guide.md`](n8n-api-toolkit-guide.md)
+- **Setup Guide**: [`n8n-api-toolkit-guide.md`](n8n-api-toolkit-guide.md)
+- **Cloud Authentication**: [`n8n-cloud-authentication-guide.md`](n8n-cloud-authentication-guide.md)
+- **MCP-Compatible Workflow**: [`n8n-api-tools-mcp-compatible.json`](n8n-api-tools-mcp-compatible.json)
 
 ---
